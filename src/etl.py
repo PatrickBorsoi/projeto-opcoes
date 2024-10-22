@@ -1,3 +1,4 @@
+#%%
 import pandas as pd
 import os
 import glob
@@ -20,8 +21,14 @@ def mover_arquivos(path_downloads: str, path_pasta_padrao_dos_arquivos: str, pri
 
 def ler_arquivos(path_pasta_padrao_dos_arquivos: str) -> pd.DataFrame:
     arquivos_excel = glob.glob(os.path.join(path_pasta_padrao_dos_arquivos, '*.xlsx'))
-    df_list: pd.DataFrame = [pd.read_excel(arquivo,skiprows=1,engine='openpyxl') for arquivo in arquivos_excel]
-    df_tabela_total: pd.DataFrame = pd.concat(df_list, ignore_index=True)
+    df_list: list = [pd.read_excel(arquivo,skiprows=1,engine='openpyxl') for arquivo in arquivos_excel]
+    df_tabela_total: list = pd.concat(df_list, ignore_index=True)
+    df_tabela_total = pd.DataFrame(df_tabela_total)
+    df_tabela_total.columns= df_tabela_total.columns.str.strip()
+    # df_tabela_total['Strike'] = df_tabela_total['Strike'].combine_first(df_tabela_total['Strike'])
+    df_tabela_total['Strike'] = df_tabela_total['Strike']
+
+
     return df_tabela_total
 
 
@@ -38,19 +45,21 @@ def exportar_arquivo(path_database: str,df: pd.DataFrame, formato_do_arquivo: st
             df.to_csv(f'{path_database}/{data_atual}_arquivo todas opções.csv')
             return 'Arquivo exportado com sucesso'
         elif formato == "xlsx" or "excel":
-            df.to_excel(f'{path_database}/{data_atual}_arquivo todas opções.xlsx')
+            df.to_excel(f'{path_database}/{data_atual}_arquivo todas opções.xlsx',index=False)
         else:
             return 'Digite o formato de arquivo certo'
 
 
-# Funções de transformação
-def remover_colunas(df: pd.DataFrame):
+# Funções de transformaçã
+# %%
+def transformacao(df: pd.DataFrame):
+        # Remover colunas do dataframe
     colunas_para_remover = ['F.M.', 'A/I/OTM']
-    df_final = df_final.drop(columns=colunas_para_remover)
+    df_final = df.drop(columns=colunas_para_remover)
 
     # Remova as linhas onde a coluna 'Mod.' é igual a 'A'
     df_final = df_final[df_final['Mod.'] != 'A']
 
     # Remova as linhas onde a coluna 'Núm. de Neg.' é menor que 50
-    df_final = df_final[df_final['Núm. de Neg.'] >= 30]
+    df_final = df_final[df_final['Núm. de Neg.'] >= 50]
     return df_final
