@@ -58,14 +58,8 @@ def remover_arquivos(path_pasta_padrao_dos_arquivos: str, primeira_palavra):
         os.remove(arquivo)
 
 def exportar_arquivo(path_database: str,df: pd.DataFrame, formato_do_arquivo: str, data_atual: datetime) ->str:
-    for formato in formato_do_arquivo:
-        if formato == "csv":
-            df.to_csv(f'{path_database}/{data_atual}_arquivo todas opções.csv')
-            return 'Arquivo exportado com sucesso'
-        elif formato == "xlsx" or "excel":
             df.to_excel(f'{path_database}/{data_atual}_arquivo todas opções.xlsx',index=False)
-        else:
-            return 'Digite o formato de arquivo certo'
+
 
 
 # Funções de transformaçã
